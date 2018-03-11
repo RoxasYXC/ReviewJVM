@@ -59,5 +59,16 @@
 		- 如果一个对象被确定为非逃逸，那在运行时，他就会被分解为标量。从而进行栈上分配。
 		- -XX:+EliminateAllocations 默认开启
 	- 参考TestOnStack.java。
-
+- 方法区
+	- 线程共享，存放类信息，如字段、方法、常量池等。
+	- 类过多可能会导致方法区溢出，一般方法区溢出都是动态生成代理类导致的。
+		- 参考
+	- 方法区大小设置
+		-  in Jdk 1.6、1.7
+			- -XX:PermSize
+			- -XX:MaxPermSize
+		- in 1.8
+			- -XX:MaxMetaspaceSize
+			- 1.8中方法区直接使用堆外内存，所以指定-XX:MaxMetaspaceSize是十分有必要的，可以防止程序耗尽整个服务器的资源。
+		
 
