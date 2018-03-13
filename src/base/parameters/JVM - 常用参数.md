@@ -47,3 +47,22 @@
 - 工作方式
 	- -server
 	- -client
+	
+- GC
+	- -XX:+UseSerialGC 新生代老年代都使用串行回收器，client模式下的默认收集器
+	- -XX:+UseParNewGC 新生代使用ParNew回收器，来年代使用串行回收器
+	- -XX:+UseParallelGC 新生代使用ParallelGC回收器，老年代使用串行回收器
+	- -XX:+UseConcMarkSweepGC 新生代使用ParNew回收器，老年代使用CMS
+	- -XX:ParallelGCThreads 执行垃圾回收的线程数量，一般当CPU小于8核时对应核数，超过则等于3+5*CPU/8
+	- -XX:MaxPauseMillis 最大垃圾收集停顿时间
+	- -XX:+UseParallelOldGC 新生代使用ParallelGC回收器，老年代使用ParallelOldGC回收器
+	- -XX:MaxPauseMillis 最大垃圾收集停顿时间，由于ParallelGC会根据设定时间来调整堆大小来适应，所以过小的数值可能反而会降低系统的吞吐量
+	- -XX:GCTimeRatio 吞吐量大小，0-100整数，假设值为n，系统将不超过1/(1+n)的时间用于垃圾收集
+	- -XX:+UseAdaptiveSizePolicy 虚拟机自行调节eden/s0/s1/老年代的大小、晋升老年代的次数等，自动调优策略。
+	- -XX:-CMSPrecleaningEnabled 不使用预清理
+	- -XX:ConcGCThreads 设定CMS并发线程数
+	- -XX:ParallelCMSThreads 同上
+	- -XX:CMSInitiatingOccupancyFraction CMS回收时老年代占用阈值，默认68
+	- -XX:+UseCMSCompactAtFullCollection CMS完成后，进行一次内存整理，非并发。
+	- -XX:+CMSFullGCsBeforeCompaction 指定次数的CMS回收后，进行一次内存整理。
+	- -XX:+CMSClassUnloadingEnabled 开启使用CMS回收Perm区Class数据的功能
