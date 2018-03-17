@@ -1,0 +1,76 @@
+# JVM 性能监控命令
+- top
+	- CPU行
+		- us(er) 用户cpu占用率
+		- sy(stem) 内核cpu占用率
+		- ni(ce) 用户进程改变或优先级的进程CPU占用率
+		- id(le) 空闲
+		- wa 等待io的cpu
+		- hi 硬件终端秦秋
+		- si 软件终端请求
+	- top -Hp 查看线程
+- vmstat
+	- proc
+		- r 等待运行的进程数
+		- b 出在非中断睡眠态的进程数
+	- Memory 单位kb
+		- swpd 虚拟内存使用状况
+		- free 空闲内存	
+		- buff 缓存内存数
+	- swap KB/秒
+		- si 从磁盘交换到内存的交换页数量
+		- so 从内存交换到磁盘的交换页数量
+	- IO 块/秒
+		- bi 发送到块设备的块数
+		- bo 从设备块接收到的块数
+	- System
+		- in 没秒的中断数，包括时钟中断
+		- cs 每秒上下文切换次数 
+	- CPU
+		- us 用户CPU时间
+		- sy 内核CPU系统使用事件
+		- id 空闲时间    
+- iostat 提供详尽的io信息
+- pidstat -p 提供进程相关的信息
+	- -u CPU
+	-  -t 可以排查线程
+	- -d 可以排查io
+- jps
+	- -m 显示传递给main的args
+	- -l 输出main的完成路径
+	- -v 显示vm args
+- jstat
+	- -class 显示ClassLoader的相关信息
+	- -compiler 显示JIT编译相关信息
+	- -gc 显示与gc相关的堆信息
+	- -gccapacity 显示各个代的内存容量和使用情况
+	- -gccause 显示垃圾收集相关信息，同时显示最后一次或当前正在发生的gc的原因
+	- -gcnew 显示新生代信息
+	- -gcnewcapacity 显示新生代大小和使用情况
+	- -gcold 显示老年代信息
+	- -gcoldcapacity 显示老年代大小和使用情况
+	- -gcpermcapacity 显示永久代的大小和使用情况
+	- -gcutil 显示垃圾收集信息
+	- -printcompilation 输出JIT编译的方法信息
+- jinfo 查看扩展vmargs，甚至支持在运行时，修改部分参数
+	- jinfo -flag<name> <pid> 查看指定vmarg
+	- jinfo -flag[+|-]<name> <pid> 修改指定的vmarg开关
+	- jingo -flag<name>=<value> <pid>
+- jmap 
+	- jmap -histo <pid> 生成对象统计信息
+	- jmap -dump 导出HeapDump
+	- jmap -permstat <pid>
+- jhat 查看dump文件 
+	jhat <filename>
+- jstack 
+	- jstack -l <pid> 打印锁的附加信息
+- jcmd 
+	- jcmd -l 和jps功能一样
+	- jcmd <pid> help
+- hprof
+	- java -agentlib:hprof=help
+- JConsole
+	- open $JAVA_HOME/bin/JConsole
+- Visual VM
+	- open $JAVA_HOME/bin/jvisualvm
+	- BTrace插件可用

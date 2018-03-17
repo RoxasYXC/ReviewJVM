@@ -119,4 +119,45 @@
 		- -XX:+UseCMSCompactAtFullCollection CMS完成后，进行一次内存整理，非并发。
 		- -XX:+CMSFullGCsBeforeCompaction 指定次数的CMS回收后，进行一次内存整理。
 		- -XX:+CMSClassUnloadingEnabled 开启使用CMS回收Perm区Class数据的功能
+	- G1
+		- since JDK1.7
+		- 分区算法 青年代和老年代不要求连续
+		- 并行性 多线程回收
+		- 并发性 与应用交替执行
+		- 分代GC 兼顾年轻代和老年代
+		- 空间整理 G1在回收过程中会进行适当的对象复制
+		- 可预见性 分区回收，对全局停顿进行了较好的控制
+		- 4个可能的阶段
+			- 新生代GC
+				- 仍旧采用赋值算法，和其他收集器没有特别大的区别
+			- 并发标记周期
+				- 并发阶段类似CMS，有如下阶段
+					- 初始标记（initial mark） 标记从根节点直接可达的对象，触发一次young gc，stw
+					- 根区域扫描 (root region scan) 扫描survivor区直接可达的老年代对象，如该动作和young gc同时发生的话，young gc会暂停等待，导致gc时间延长
+					- 并发标记（conc mark） 和CMS类似，查找全堆的存活对象进行标记，可能会被young gc打断
+					- 重新标记 (remark)  STW SATB（snapshot at the beginning） 修正并发标记过程中的新状况
+					- 独占清理 (clean up) STW 计算所有分区的存活对象和GC回收比例，并进行排序；识别标记可供混合回收的区域。
+					- 并发清理阶段(conc clean up) 清理完全空闲的分区
+				- 该阶段只回收完全空闲的分区，所以可能性比较低，该阶段能够回收的内存空间是很有限的
+			- 混合收集
+				- 根据独占清理阶段的排序结果识别需要优先清理的分区
+				- young gc和old gc一通进行
+				- gc完成后，清理区域内的存活对象会复制到其他分区当中
+				- 混合gc会执行多次直到释放了足够多的内存，之后再触发一次young gc，进入循环
+			- Full GC
+				- 特定情况下触发Full GC
+		-  Remembered Set
+			- 更新记忆集，每一个G1分区都有一个RS关联，用来记录本分区中被其他分区对象引用的对象。
+		- -XX:+UseG1GC 启用G1
+		- -XX:MaxGCPauseMillis 目标最大停顿时间，不满足时G1会自动进行堆内比例、堆大小、晋升年龄等 
+		- -XX:ParallelGCThreads 执行垃圾回收的线程数量，建议数量上面提到过了。
+		- -XX:InitiatingHeapOccupancy 在堆内存达到多少时，进行并发标记周期。
+- 细节问题
+	- 禁用system.gc()
+		- 触发FullGC，新生代老年代同时进行。
+		- -XX:+DisableExplicitGC 禁止显式调用GC
+		- -XX:+ExplicitGCInvokeConcurrent 允许显式调用GC进行并发操作
+	- 并行GC前额外触发的新生代GC
+		- 在使用ParallelGC时，会在FullGC前进行一次YoungGC，以此来起到缩短停顿的目的。
+		- -XX:-ScavengeBeforeFullGC 可以关闭并行GC前额外触发的新生代GC
 		

@@ -31,6 +31,7 @@
  	- -XX:+HeapDumpOnOutOfMemoryError OOM是导出HeapDump
  	- -XX:HeapDumpPath=<path> HeapDump的导出存放路径
  	- -XX:OnOutOfMemoryError=<cmd> <arg> 在OOM时执行命令
+ 	- -XX:PretenureSizeThreshold 大对象进入老年代的阈值
 	
 - 方法区
 	- -XX:PermSize
@@ -66,3 +67,15 @@
 	- -XX:+UseCMSCompactAtFullCollection CMS完成后，进行一次内存整理，非并发。
 	- -XX:+CMSFullGCsBeforeCompaction 指定次数的CMS回收后，进行一次内存整理。
 	- -XX:+CMSClassUnloadingEnabled 开启使用CMS回收Perm区Class数据的功能
+	- -XX:+UseG1GC 启用G1
+	- -XX:MaxGCPauseMillis 目标最大停顿时间，不满足时G1会自动进行堆内比例、堆大小、晋升年龄等 
+	- -XX:ParallelGCThreads 执行垃圾回收的线程数量，建议数量上面提到过了。
+	- -XX:InitiatingHeapOccupancy 在堆内存达到多少时，进行并发标记周期。
+	- -XX:+DisableExplicitGC 禁止显示调用GC
+	- -XX:+ExplicitGCInvokeConcurrent 允许显式调用GC进行并发操作
+	- -XX:-ScavengeBeforeFullGC 可以关闭并行GC前额外触发的新生代GC
+
+- TLAB
+	- -XX:TLABRefillWasteFraction refill_waste=n设置，n值为0-100的整数，代表rw是TLAB的多少分之1。
+	- -XX:TLABSize=n n值为b，即TLAB的大小是多少个字节
+	- -XX:+ResizeTLAB 是否开启rw的自动调整策略
