@@ -1,0 +1,39 @@
+# JVM 堆分析
+- OOM分析
+	- OOMError本身就是可捕捉的，捕捉后进行合理的处理后程序是可以继续执行的。
+	- heap space 堆空间溢出
+		- 参考HeapSpaceOOM.java
+		- 一般解决思路
+			- OOM时导出dump，visualvm分析，找到大对象的来源进行优化
+	- 直接内存溢出
+		- 参考DirectBufferOOM.java
+		- 一般解决思路
+			- 设置-XX:MaxDirectMemorySize 堆外内存最大空间
+	- 线程过多
+		- 参考MultiThreadOOM.java
+		- 一般解决思路
+			- -Xss减少栈的分配
+			- 合理减少线程数量 
+	- Perm溢出
+		- 一般解决思路
+			- 加大永久带
+			- 减少动态生成类
+			- 合理使用ClassLoader，并定期进行回收
+	- GC overhead limit exceeded
+		- 用超过98%的时间回收了2%的老年代或eden空间
+		- 一般系统呈现假死状态
+		- -XX:-UseGCOverheadLimit 可以选择开启或关闭
+		- 一般解决思路 
+			- 和heap space处理思路一致
+- MAT
+	- Eclipse内存管理其插件
+- 深堆和浅堆
+	- 浅堆(Swallow Heap)是指一个对象所消耗的内存
+	- 深堆(Retained Heap)
+		- 保留集(Retained Set)
+			- 一个对象被回收后咩可以释放的所有对的对象集合
+			- 深堆值的就是这个保留集的浅堆的和
+			-  对象的实际大小
+				- 对象的实际大小指的是一个对象所能触及的所有对象的浅堆大小之和
+- OQL
+	- TODO

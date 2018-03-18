@@ -1,0 +1,58 @@
+# JVM 锁
+- 对象头和锁
+	- 每个对象都有一个对象头，对象头中有Mark word，Mark word是实现锁的关键。
+		- 在32位系统中是一个32位的数据，64位系统中是一个64位的数据。
+		- Mark word里主要记录了对象的hash、年龄、锁指针、是否占用锁、占用哪个锁等信息。
+- JDK对锁的优化
+	- 偏向锁
+		- 线程没有竞争，就取消当前锁
+		- -XX:+UseBiasedLocking 是否启用偏向锁
+	- 轻量级锁
+		- 如果轻量级锁失败，线程会申请轻量级锁。
+		- 结构
+			- BasicLockObject 
+				- BasicLock
+				- 持有该锁的Java对象指针
+				- displaced_header字段，用于备份对象头的Markword
+		- 流程
+			- BasicLock通过set_displaced_header方法备份原对象的markword。
+			- cas尝试将BasicLock的地址复制到markword
+				- 成功，加锁成功
+				- 失败，可能被膨胀为重量级锁
+	- 锁膨胀
+		- 轻量级锁处理失败后，会进行锁膨胀
+		- 流程
+			- 放弃BasicLock备份的对象头信息
+			- 调用inflate()进行锁膨胀，获取对象的ObjectMonitor
+			- 调用enter()方法尝试进入该锁
+	- 锁消除
+		- 开启逃逸分析的情况下，可以使用锁消除机制来提高程序的运行效率。
+			
+- 在应用层对锁进行优化的思路
+	- 减少同步时间，只在必要时进行同步。
+	- 减小锁的颗粒度，ConcurrentHashMap的实现
+	- 锁分离，LinkedBlockingQueue的实现
+	- 锁粗化，对短时间内需要多次申请同一锁的操作进行合并，只申请一次锁
+
+- 无锁
+	- CAS
+	- LongAdder 逻辑类似ConcurrentHashMap
+- JMM
+	- 原子性 synchronized和JUC.Lock
+		- 一个操作或者多个操作 要么全部执行并且执行的过程不会被任何因素打断，要么就都不执行。
+	- 可见性 volatile、synchronized和JUC.Lock
+		- 多个线程访问同一个变量时，一个线程修改了这个变量的值，其他线程能够立即看得到修改的值。
+	- 有序性 volatile、synchronized、JUC.Lock、JMM Happens-Before原则
+		- 程序执行的顺序按照代码的先后顺序执行。
+		- 指令重排序（Instruction Reorder）
+			- 处理器为了提高程序运行效率，可能会对输入代码进行优化，它不保证程序中各个语句的执行先后顺序同代码中的顺序一致，但是它会保证程序最终执行结果和代码顺序执行的结果是一致的。
+			- 处理器在进行重排序时是会考虑指令之间的数据依赖性，如果一个指令Instruction 2必须用到Instruction 1的结果，那么处理器会保证Instruction 1会在Instruction 2之前执行。
+			- 指令重排序不会影响单个线程的执行，但是可能会影响到线程并发执行的正确性。
+		- 指令重排的Happens-Before原则
+			- 程序顺序原则：一个县城内保证语义的串行性
+			- volatile规则：volatile变量的写发生在读之前，以此来保证可见性
+			- 锁规则：unlock先于lock
+			- 传递性：A先于B，B先于C，则A先于C
+			- 线程的start方法先于他的其他所有动作
+			- 线程的interrupt先于被中断线程的代码
+			- 对象的构造函数执行结束先于finalize
