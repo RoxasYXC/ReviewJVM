@@ -24,6 +24,7 @@
 	- Xms 初始堆大小
 	- Xmx 最大堆空间
 		-  初始堆和最大堆可以设置相等，这样可以减少垃圾回收的次数，从而提高程序的性能
+	- -XX:MaxDirectMemorySize 堆外内存最大空间
  	- -Xmn 设置新生代的大小，一般新生代和老年代的比例为1：3或1：4
  	- -XX:SurvivorRatio=(eden/s0=eden/s1) 设置eden和s0、s1的比例关系	 
  	- -XX:NewRatio=(tenured/young) 指定老年代和新生代的比例关系
@@ -32,6 +33,8 @@
  	- -XX:HeapDumpPath=<path> HeapDump的导出存放路径
  	- -XX:OnOutOfMemoryError=<cmd> <arg> 在OOM时执行命令
  	- -XX:PretenureSizeThreshold 大对象进入老年代的阈值
+ 	- -XX:MaxDirectMemorySize 堆外内存最大大小
+ 	- -XX:-UseGCOverheadLimit 是否使用GC Overhead Limit exceeded
 	
 - 方法区
 	- -XX:PermSize
@@ -79,3 +82,7 @@
 	- -XX:TLABRefillWasteFraction refill_waste=n设置，n值为0-100的整数，代表rw是TLAB的多少分之1。
 	- -XX:TLABSize=n n值为b，即TLAB的大小是多少个字节
 	- -XX:+ResizeTLAB 是否开启rw的自动调整策略
+	
+- 锁
+	- -XX:+UseBiasedLocking 是否启用偏向锁
+	- -XX:BiasedLockingStartupDelay 偏向锁启用延迟，默认4秒
