@@ -60,7 +60,7 @@
 			 - C编写，没有Java对象与之对应，加载系统核心类（比如String、rt.jar）
 		- Extension ClassLoader 扩展类加载器
 			- 用于加载JAVA_HOME/lib/ext/*.jar
-		- App ClassLoader 系统类加载器
+		- App ClassLoader 应用类加载器
 			- 用于加载用户类
 		- 自定义的ClassLoader
 			- 加载一些特殊途径的类，一般也是用户类
@@ -70,4 +70,15 @@
 		- 类加载的时候，系统会判断当前类是否被加载，如果已经被加载，直接返回可用的类。
 		- 如果没加载，则尝试加载，会先请求双亲处理，如果双亲请求失败，则会自行加载。
 		- 弊端
-			- 自底向上检查，系统类无法访问应用类
+			- 自底向上检查类加载，顶层的ClassLoader无法访问底层的ClassLoader所加载的类
+			- 例如jdbc的api需要调用应用类加载器的jdbc驱动
+		- 解决方式
+			- Thread实例的setContextClassLoader方法
+			- 把一个ClassLoader置于一个线程实例当中，使该ClassLoader成为一个相对共享的实例，一般情况下，上下文加载器就是应用加载器这样即使在启动类加载器中的代码也可以通过这种方式访问应用加载器中的类了。
+		- 突破双亲模式
+			- 通过重载java.lang.ClassLoader类中的loadClass方法实现
+		- 热替换
+			- 不同的ClassLoader加载的同名类属于不同类型，不能相互转化和兼容
+			- 两个不同ClassLoader加载同一个类，在虚拟机内部，会认为这两个类是完全不同的
+			- 通过重载java.lang.ClassLoader类的findClass方法实现
+			- URLClassLoader
