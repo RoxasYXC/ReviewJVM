@@ -58,7 +58,7 @@
 	- jingo -flag<name>=<value> <pid>
 - jmap 
 	- jmap -histo <pid> 生成对象统计信息
-	- jmap -dump 导出HeapDump
+	- jmap -dump:format=b,file=文件名 [pid] 导出HeapDump
 	- jmap -permstat <pid>
 - jhat 查看dump文件 
 	jhat <filename>
